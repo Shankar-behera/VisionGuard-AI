@@ -1,0 +1,10 @@
+{
+  "buildCommand": "echo 'Skipping build command for Python function'",
+  "installCommand": "pip install -r backend/requirements.txt",
+  "outputDirectory": null,
+  "functions": {
+    "backend/main.py": {
+      "runtime": "python3.12"
+    }
+  }
+}
