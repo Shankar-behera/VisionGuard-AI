@@ -17,37 +17,7 @@ By executing a low-latency local pass first, VisionGuard processes clean frames 
 
 Pure cloud VLM inspection introduces latency overhead, bandwidth consumption, and prohibitive token costs per frame. Pure edge object detection fails at semantic context (e.g., distinguishing between a ladder standing idle vs. a worker using a ladder unsafely). VisionGuard resolves this trade-off using a tiered routing architecture.
 
-```mermaid
-flowchart TD
-    %% Define Styles
-    classDef client fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#f8fafc,rx:8px,ry:8px
-    classDef gateway fill:#1e293b,stroke:#6366f1,stroke-width:2px,color:#f8fafc,rx:8px,ry:8px
-    classDef logic fill:#334155,stroke:#94a3b8,stroke-width:1px,color:#f8fafc
-    classDef edge fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5,rx:8px,ry:8px
-    classDef cloud fill:#4c1d95,stroke:#8b5cf6,stroke-width:2px,color:#f5f3ff,rx:8px,ry:8px
-    classDef output fill:#0f172a,stroke:#e2e8f0,stroke-width:2px,color:#f8fafc,rx:4px,ry:4px
-
-    %% Nodes
-    UI[Browser UI <br/> Live Frame Capture] ::: client
-    API[FastAPI Gateway <br/> Rate Limits, Auth, Validation] ::: gateway
-    DeepCheck{deep_analysis <br/> == true?} ::: logic
-    Edge[Tier 1: Local Edge Pass <br/> YOLOv8n ONNX <br/> ~105ms CPU Latency] ::: edge
-    ConfCheck{Confidence <br/> >= 0.50?} ::: logic
-    Cloud[Tier 2: Cloud VLM <br/> Google Gemini <br/> Multimodal Escalation] ::: cloud
-    ReturnEdge(Immediate Return <br/> engine='local') ::: edge
-    JSON[/Standardized JSON Detections <br/> Bounding Boxes & Risk/] ::: output
-
-    %% Connections
-    UI --> API
-    API --> DeepCheck
-    DeepCheck -- "Yes" --> Cloud
-    DeepCheck -- "No" --> Edge
-    Edge --> ConfCheck
-    ConfCheck -- "Yes" --> ReturnEdge
-    ConfCheck -- "No" --> Cloud
-    ReturnEdge --> JSON
-    Cloud --> JSON
-```
+![VisionGuard AI Architecture](architecture/img.png)
 
 ### Routing Logic
 
