@@ -1,30 +1,21 @@
-# Model weights are fetched via scripts/download_model.sh, not committed.
-# (The zip/portfolio copy of this project ships the weights directly for
-# convenience — this file only matters once you push to a git repo.)
+
 models/*.onnx
 eval/report.json
 .env
-
-
 # Python
 __pycache__/
 *.py[cod]
 .venv/
 venv/
 .pytest_cache/
-
 # Env / secrets
-.env
 *.env.local
-
 # Node / Vercel
 node_modules/
 .vercel/
-
 # OS
 .DS_Store
 Thumbs.db
-
 # IDE
 .vscode/
 .idea/
