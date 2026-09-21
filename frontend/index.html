@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VisionGuard AI — Edge Inspection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'], 
+                        mono: ['JetBrains Mono', 'monospace'] 
+                    },
+                    colors: {
+                        background: '#09090b',
+                        panel: '#18181b',
+                        border: '#27272a'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-slate-300 min-h-screen flex flex-col font-sans selection:bg-blue-500/30 overflow-hidden">
+
+    <!-- Top Navigation -->
+    <header class="h-14 border-b border-border bg-background flex items-center justify-between px-6 shrink-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-6 h-6 flex items-center justify-center bg-slate-100 rounded text-background">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            </div>
+            <h1 class="text-sm font-semibold text-slate-100 tracking-tight">VisionGuard <span class="text-slate-500 font-normal">Edge Inspection</span></h1>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <span id="statusPill" class="flex items-center gap-2 text-[11px] px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 font-mono tracking-wide">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse"></span>
+                <span>Connecting...</span>
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 w-full flex flex-col lg:flex-row p-6 gap-6 h-[calc(100vh-56px)] min-h-0">
+        
+        <!-- Left Column: Camera Viewport -->
+        <section class="flex-1 flex flex-col min-w-0 bg-panel border border-border rounded-xl overflow-hidden shadow-sm">
+            
+            <!-- Viewport Header -->
+            <div class="h-12 border-b border-border flex items-center justify-between px-4 bg-background/50">
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                    <span class="text-xs font-medium text-slate-300">Live Feed</span>
+                </div>
+                <button id="captureBtn" disabled class="flex items-center justify-center gap-2 bg-slate-100 hover:bg-white text-slate-900 disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed text-xs font-semibold h-8 px-4 rounded-md transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Run Inspection
+                </button>
+            </div>
+
+            <!-- Video Area -->
+            <div class="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
+                <video id="webcam" autoplay playsinline muted class="absolute inset-0 w-full h-full object-contain"></video>
+                <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full object-contain pointer-events-none z-10"></canvas>
+
+                <!-- Processing Overlay -->
+                <div id="loader" class="hidden absolute inset-0 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-20">
+                    <div class="w-6 h-6 border-2 border-slate-600 border-t-white rounded-full animate-spin"></div>
+                    <p class="text-xs text-slate-300 font-mono">Processing inference...</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="cameraError" class="hidden absolute inset-0 bg-background flex flex-col items-center justify-center gap-3 z-30">
+                    <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <p class="text-slate-400 text-sm font-medium" id="cameraErrorDetail">Camera signal lost</p>
+                </div>
+            </div>
+
+            <!-- Global Error Banner -->
+            <div id="errorBanner" class="hidden border-t border-red-900/50 bg-red-950/30 text-red-400 text-xs px-4 py-2.5 font-mono"></div>
+        </section>
+
+        <!-- Right Column: Inspector Panel -->
+        <aside class="w-full lg:w-80 flex flex-col bg-panel border border-border rounded-xl shadow-sm overflow-hidden min-h-0">
+            
+            <div class="px-4 py-3 border-b border-border bg-background/50">
+                <h2 class="text-xs font-semibold text-slate-200">Inspection Results</h2>
+            </div>
+
+            <!-- Telemetry Stats -->
+            <div class="grid grid-cols-2 gap-4 p-4 border-b border-border bg-background/20">
+                <div class="flex flex-col gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-500">Active Model</span>
+                    <span id="modelTag" class="text-xs font-mono text-slate-300 truncate">Awaiting feed...</span>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-500">Latency</span>
+                    <span id="latencyTag" class="text-xs font-mono text-slate-300">-- ms</span>
+                </div>
+            </div>
+
+            <!-- Detection List -->
+            <div class="flex-1 flex flex-col min-h-0">
+                <div class="px-4 py-3">
+                    <h3 class="text-[10px] uppercase tracking-wider font-semibold text-slate-500">Detected Objects</h3>
+                </div>
+                <div id="detectionsList" class="flex-1 overflow-y-auto px-4 pb-4 space-y-2 custom-scrollbar">
+                    
+                    <!-- Empty State -->
+                    <div class="flex flex-col items-center justify-center h-full gap-2 opacity-60">
+                        <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        <p class="text-xs text-slate-400 font-medium">No active detections</p>
+                    </div>
+
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

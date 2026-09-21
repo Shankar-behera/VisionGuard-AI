@@ -1,0 +1,14 @@
+{
+  "_note": "Boxes are box_2d = [ymin, xmin, ymax, xmax], normalized 0-1000, hand-labeled by visually inspecting each image independently of any model output. Source images are the standard public test assets from the ultralytics/ultralytics repo (bus.jpg, zidane.jpg), used here only as fixed, reproducible test frames.",
+  "bus.jpg": [
+    { "label": "bus", "box_2d": [200, 20, 700, 990] },
+    { "label": "person", "box_2d": [360, 60, 830, 305] },
+    { "label": "person", "box_2d": [375, 270, 800, 430] },
+    { "label": "person", "box_2d": [340, 820, 830, 1000] },
+    { "label": "person", "box_2d": [490, 0, 810, 75] }
+  ],
+  "zidane.jpg": [
+    { "label": "person", "box_2d": [271, 101, 1000, 703] },
+    { "label": "person", "box_2d": [49, 586, 1000, 1000] }
+  ]
+}
