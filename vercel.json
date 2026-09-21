@@ -1,9 +1,4 @@
 {
   "installCommand": "pip install -r backend/requirements.txt",
-  "buildCommand": "",
-  "functions": {
-    "backend/main.py": {
-      "runtime": "@vercel/python@4.3.0"
-    }
-  }
+  "buildCommand": ""
 }
