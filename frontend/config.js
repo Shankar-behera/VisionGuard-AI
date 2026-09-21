@@ -7,5 +7,5 @@
 // the backend instead of relying on this key alone.
 window.APP_CONFIG = {
   BACKEND_URL: "http://localhost:8000",
-  API_KEY: "change_me_to_a_long_random_string",
+  API_KEY: "becd0519bd76339b26753a54072838ae24f959dd4dbb5da8bbe1dcecbaa07ba6",
 };
